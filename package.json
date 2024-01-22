@@ -1,0 +1,13 @@
+{
+  "name": "veganparadise-api",
+  "version": "1.0.0",
+  "description": "Know your veggies API",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
+
