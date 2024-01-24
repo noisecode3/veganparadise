@@ -1,8 +1,58 @@
 const express = require('express');
+const mysql = require('mysql2');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 const stores = require('./stores.json')
+
+
+const connectToDatabase = () => {
+  const connection = mysql.createConnection({
+    host: 'db', // Use the service name of your MySQL container
+    user: process.env.MYSQL_USER,
+    password: process.env.MYSQL_PASSWORD,
+    database: process.env.MYSQL_DATABASE,
+  });
+
+  connection.connect((err) => {
+    if (err) {
+      console.error('Error connecting to database:', err);
+      // Retry connection after 3 seconds
+      setTimeout(connectToDatabase, 3000);
+    } else {
+      console.log('Connected to database');
+
+      // Perform your database operations here
+
+      // Close the connection after your operations
+      connection.end();
+    }
+  });
+};
+
+// Start the initial connection attempt
+connectToDatabase();
+
+
+
+
+
+const connection = mysql.createConnection({
+  host: 'db',
+  user: process.env.MYSQL_USER,
+  password: process.env.MYSQL_PASSWORD,
+  database: process.env.MYSQL_DATABASE,
+});
+
+connection.connect((err) => {
+  if (err) {
+    console.error('Error connecting to MySQL:', err);
+  } else {
+    console.log('Connected to MySQL');
+  }
+});
+
+
 
 
 // Example model
