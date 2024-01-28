@@ -1,0 +1,40 @@
+version: '3'
+services:
+  api:
+    image: node:18-alpine
+    working_dir: /usr/src/app
+    environment:
+      - NODE_ENV=production
+    ports:
+      - "3000:3000"
+      - "9229:9229"
+    volumes:
+      - .:/usr/src/app
+    depends_on:
+      - db
+    command: sh -c "npm install --only=production && node --inspect=0.0.0.0:9229 index.js"
+
+  db:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: broccoli
+      MYSQL_USER: veganburger
+      MYSQL_PASSWORD: tofu
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./private.key:/etc/nginx/ssl/private.key:ro
+      - ./fullchain.pem:/etc/nginx/ssl/fullchain.pem:ro
+    depends_on:
+      - api
+

@@ -1,4 +1,0 @@
-docker-compose exec db mysql -u root -p
-USE broccoli;
-SHOW TABLES;
-DESCRIBE your_table_name;

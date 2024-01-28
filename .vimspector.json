@@ -1,0 +1,19 @@
+{
+  "configurations": {
+    "Node.js: Launch": {
+      "adapter": "vscode-node-debug2",
+      "request": "launch",
+      "name": "Launch Program",
+      "program": "${workspaceFolder}/index.js",
+      "skipFiles": ["<node_internals>/**"],
+      "outFiles": ["${workspaceFolder}/dist/**/*.js"],
+      "stopOnEntry": false,
+      "args": [],
+      "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["--nolazy"],
+      "port": 9229
+    }
+  }
+}
+
