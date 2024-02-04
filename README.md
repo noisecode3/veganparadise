@@ -5,7 +5,7 @@ This is a simple API built with [Express](https://expressjs.com/).
 ## Getting Started
 
 1. Run docker with output to terminal: `docker-compose up`
-2. Take down server: `docker-compose down -v`
+2. Take down server: `docker-compose down -v` on another terminal or use ctrl+C
 3. Run with more then one server `docker-compose up -d --scale api=3`
 
 ## Entering mysql server

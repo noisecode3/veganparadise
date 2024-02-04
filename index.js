@@ -13,7 +13,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Enable sessions
-app.use(session({ secret: 'your-secret-key', resave: true, saveUninitialized: true }));
+app.use(session({ secret: 'your-secret-key', resave: false, saveUninitialized: false }));
 
 // Enable csurf protection after session
 app.use(csurf());
@@ -43,18 +43,17 @@ model.init()
     app.get('/', (req, res) => {
       res.sendFile(path.join(__dirname, './public/index.html'));
     });
-
-    // Catch-all route for serving other files from "public"
-    app.get('*', (req, res) => {
-      res.sendFile(path.join(__dirname, './public', req.url));
-    });
-
+    
     // Mount the views router
     app.use('/', view);
 
     // Mount the controllers router
     app.use('/', controller);
 
+    // Catch-all route for serving other files from "public"
+    app.get('*', (req, res) => {
+      res.sendFile(path.join(__dirname, './public', req.url));
+    });
 
     // Start the server
     app.listen(PORT, '0.0.0.0', () => {

@@ -3,6 +3,33 @@ const router = express.Router();
 const userModel = require('./userModel');
 const model = require('./model');
 
+// Read the image file as binary data
+const profilePictureData = fs.readFileSync('path/to/profile-picture.jpg');
+
+// Insert the data into the database
+connection.query('INSERT INTO users (username, profile_picture) VALUES (?, ?)', ['john_doe', profilePictureData], (error, results, fields) => {
+  if (error) throw error;
+  console.log('Profile picture inserted successfully');
+});
+
+
+// Assuming you have a route for user login
+router.post('/login', (req, res) => {
+  const { username, password } = req.body;
+
+  // Validate the username and password, and if valid, set the username in the session
+  if (isValidLogin(username, password)) {
+    req.session.username = username;
+    res.send('Login successful');
+  } else {
+    res.send('Invalid credentials');
+  }
+});
+function isValidLogin(username, password) {
+  // Implement your validation logic here
+  return true; // For demonstration purposes, always return true
+}
+
 router.post('/users', (req, res) => {
   const { username } = req.body;
 

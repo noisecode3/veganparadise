@@ -14,17 +14,17 @@ class Model {
       operation.attempt(async (currentAttempt) => {
         try {
           this.client = await mysql.createConnection({
-            user: 'read_only_user',
+            user: 'veganburger',
             host: 'db',
             database: 'broccoli',
-            password: 'read_only_password',
+            password: 'tofu',
             port: 3306,
           });
 
           await this.client.connect();
           resolve();
         } catch (error) {
-          console.error(`Error connecting to MySQL (attempt ${currentAttempt}):`, error.message);
+          console.log(`Connecting to MySQL (attempt ${currentAttempt}):`, error.message);
 
           if (operation.retry(error)) {
             return;
@@ -45,38 +45,22 @@ class Model {
       console.error('Error reading stores.json:', error);
       this.stores = [];
     }
-    /*
-
-    // Database setup logic
-    await this.client.query(`
-      CREATE TABLE IF NOT EXISTS stores
-      (
-          id SERIAL NOT NULL,
-          name VARCHAR(255),
-          url VARCHAR(255),
-          district VARCHAR(255),
-          PRIMARY KEY (id)
-      );
-    `);
 
     for (const store of this.stores) {
       const [rows] = await this.client.execute(`
-        SELECT * FROM stores
+        SELECT * FROM store
         WHERE name = ?
         LIMIT 1
       `, [store.name]);
 
-      console.log(rows);
-
       if (rows.length === 0) {
         await this.client.execute(`
-          INSERT INTO stores (name, url, district)
+          INSERT INTO store (name, url, district)
           VALUES (?, ?, ?)
         `, [store.name, store.url, store.district]);
       }
     }
 
-  */
   }
 
   async getAllStores() {
