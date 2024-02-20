@@ -4,13 +4,13 @@ const userModel = require('./userModel');
 const model = require('./model');
 
 // Read the image file as binary data
-const profilePictureData = fs.readFileSync('path/to/profile-picture.jpg');
+//const profilePictureData = fs.readFileSync('path/to/profile-picture.jpg');
 
 // Insert the data into the database
-connection.query('INSERT INTO users (username, profile_picture) VALUES (?, ?)', ['john_doe', profilePictureData], (error, results, fields) => {
-  if (error) throw error;
-  console.log('Profile picture inserted successfully');
-});
+//connection.query('INSERT INTO users (username, profile_picture) VALUES (?, ?)', ['john_doe', profilePictureData], (error, results, fields) => {
+//  if (error) throw error;
+//  console.log('Profile picture inserted successfully');
+//});
 
 
 // Assuming you have a route for user login

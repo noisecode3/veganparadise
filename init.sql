@@ -2,6 +2,7 @@ DROP DATABASE IF EXISTS broccoli;
 CREATE DATABASE IF NOT EXISTS broccoli;
 
 USE broccoli;
+SET NAMES utf8mb4;
 
 CREATE USER IF NOT EXISTS 'veganburger'@'%' IDENTIFIED BY 'tofu';
 GRANT ALL PRIVILEGES ON broccoli.* TO 'veganburger'@'%';
@@ -11,24 +12,25 @@ CREATE TABLE IF NOT EXISTS users (
   id INT PRIMARY KEY AUTO_INCREMENT,
   username VARCHAR(255) UNIQUE NOT NULL,
   password VARCHAR(255) NOT NULL,
+  salt VARCHAR(255) UNIQUE NOT NULL,
   picture BLOB
 );
 
-CREATE USER IF NOT EXISTS 'read_only_user'@'%' IDENTIFIED BY 'read_only_password';
-GRANT SELECT ON broccoli.users TO 'read_only_user'@'%';
+CREATE USER IF NOT EXISTS 'readOnlyUser'@'%' IDENTIFIED BY 'readOnlyPassword';
+GRANT SELECT ON broccoli.users TO 'readOnlyUser'@'%';
 
-CREATE USER IF NOT EXISTS 'read_write_user'@'%' IDENTIFIED BY 'read_write_password';
-GRANT SELECT, INSERT, UPDATE, DELETE ON broccoli.users TO 'read_write_user'@'%';
+CREATE USER IF NOT EXISTS 'readWriteUser'@'%' IDENTIFIED BY 'readWritePassword';
+GRANT SELECT, INSERT, UPDATE, DELETE ON broccoli.users TO 'readWriteUser'@'%';
 
 CREATE TABLE IF NOT EXISTS recipe (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  userID INT NOT NULL,
+  userId INT NOT NULL,
   name TEXT NOT NULL,
   time INT NOT NULL,
   cost INT NOT NULL,
   body TEXT NOT NULL,
   picture BLOB,
-  FOREIGN KEY (userID) REFERENCES users(id)
+  FOREIGN KEY (userId) REFERENCES users(id)
 );
 
 CREATE TABLE IF NOT EXISTS item (
@@ -38,46 +40,171 @@ CREATE TABLE IF NOT EXISTS item (
 
 CREATE TABLE IF NOT EXISTS store (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  name TEXT NOT NULL,
+  name VARCHAR(255) UNIQUE NOT NULL,
   url TEXT,
   district TEXT
 );
 
+-- Middle table for item used in the recipe
 CREATE TABLE IF NOT EXISTS ingredients (
-  recipeID INT,
-  itemID INT,
-  FOREIGN KEY (recipeID) REFERENCES recipe(id),
-  FOREIGN KEY (itemID) REFERENCES item(id)
+  itemId INT NOT NULL,
+  recipeId INT NOT NULL,
+  FOREIGN KEY (itemId) REFERENCES item(id),
+  FOREIGN KEY (recipeId) REFERENCES recipe(id)
 );
 
+-- Middle table for item in the store 
 CREATE TABLE IF NOT EXISTS products (
-  itemID INT,
-  storeID INT,
-  FOREIGN KEY (itemID) REFERENCES item(id),
-  FOREIGN KEY (storeID) REFERENCES store(id)
+  itemId INT NOT NULL,
+  storeId INT NOT NULL,
+  FOREIGN KEY (itemId) REFERENCES item(id),
+  FOREIGN KEY (storeId) REFERENCES store(id)
 );
 
 DELIMITER //
 
+-- users data
+-- id INT PRIMARY KEY AUTO_INCREMENT
+-- username VARCHAR(255) UNIQUE NOT NULL
+-- password VARCHAR(255) NOT NULL
+-- salt VARCHAR(255) UNIQUE NOT NULL
+-- picture BLOB
+
 CREATE PROCEDURE insertUser(IN p_username VARCHAR(255), IN p_password VARCHAR(255))
 BEGIN
-  -- Check if p_password is a valid SHA-256 hash (64 hexadecimal characters)
-  IF LENGTH(p_password) = 64 AND p_password REGEXP '^[0-9a-fA-F]+$' AND LENGTH(p_username) = 64 AND p_username REGEXP '^[0-9a-fA-F]+$' THEN
-    INSERT INTO users (username, password) VALUES (p_username, p_password);
-  ELSE
-    -- Handle the case where p_password is not a valid SHA-256 hash
-    SIGNAL SQLSTATE '45000'
-      SET MESSAGE_TEXT = 'Invalid SHA-256 hash format';
-  END IF;
+  -- Generate a random salt
+  SET @salt = UNHEX(SHA2(UUID(), 256)); -- Use SHA2 to create a 256-bit salt
+
+  -- Hash the password with the salt
+  SET @hashed_password = SHA2(CONCAT(p_password, HEX(@salt)), 256);
+
+  -- Insert the username, salt, and hashed password into the users table
+  INSERT INTO users (username, salt, password) VALUES (p_username, @salt, @hashed_password);
 END //
 
 CREATE PROCEDURE getUserID(IN p_username VARCHAR(255), IN p_password VARCHAR(255))
 BEGIN
-  SELECT userID FROM users WHERE username=p_username AND password=p_password;
+  -- Retrieve the salt for the given username
+  SELECT salt INTO @salt FROM users WHERE username = p_username;
+
+  -- Hash the input password with the retrieved salt
+  SET @hashed_input_password = SHA2(CONCAT(p_password, HEX(@salt)), 256);
+
+  -- Retrieve the userID based on the username and hashed password
+  SELECT userID FROM users WHERE username = p_username AND password = @hashed_input_password;
+END //
+
+CREATE PROCEDURE changePicture(IN p_id INT, IN p_picture BLOB)
+BEGIN
+  UPDATE users SET picture = p_picture WHERE users.id = p_id;
+END //
+
+-- recipes data
+-- id INT AUTO_INCREMENT PRIMARY KEY
+--  userID INT NOT NULL FOREIGN KEY
+--  name TEXT NOT NULL
+--  time INT NOT NULL
+--  cost INT NOT NULL
+--  body TEXT NOT NULL
+--  picture BLOB
+
+CREATE PROCEDURE insertRecipe(
+  IN p_userID INT,
+  IN p_name TEXT,
+  IN p_time INT,
+  IN p_cost INT,
+  IN p_body TEXT,
+  IN p_picture BLOB)
+BEGIN
+  INSERT INTO recipe (userID, name, time, cost, body, picture)
+    VALUES (p_userID, p_name, p_time, p_cost, p_body, p_picture);
+END //
+
+CREATE PROCEDURE removeRecipe(IN p_id INT)
+BEGIN
+  DELETE FROM recipe WHERE recipe.id = p_id;
+END //
+
+CREATE PROCEDURE getRecipeList()
+BEGIN
+  SELECT id, name, picture FROM recipe;
+END //
+
+CREATE PROCEDURE getRecipeUserList(IN p_userid INT)
+BEGIN
+  SELECT id, name, picture FROM recipe WHERE recipe.userID = p_userid;
+END //
+
+CREATE PROCEDURE getRecipe(IN p_id INT)
+BEGIN
+  SELECT name, time, cost, body, picture FROM recipe WHERE recipe.id = p_id;
+END //
+
+CREATE PROCEDURE changeRecipeName(IN p_id INT)
+BEGIN
+  UPDATE recipe SET name = p_name WHERE recipe.id = p_id;
+END //
+
+CREATE PROCEDURE changeRecipeTime(IN p_id INT)
+BEGIN
+  UPDATE recipe SET time = p_time WHERE recipe.id = p_id;
+END //
+
+CREATE PROCEDURE changeRecipeCost(IN p_id INT)
+BEGIN
+  UPDATE recipe SET cost = p_cost WHERE recipe.id = p_id;
+END //
+
+CREATE PROCEDURE changeRecipeBody(IN p_id INT)
+BEGIN
+  UPDATE recipe SET body = p_body WHERE recipe.id = p_id;
+END //
+
+CREATE PROCEDURE changeRecipePicture(IN p_id INT)
+BEGIN
+  UPDATE recipe SET picture = p_picture WHERE recipe.id = p_id;
+END //
+
+-- Item data
+-- id INT AUTO_INCREMENT PRIMARY KEY
+-- name VARCHAR(255) UNIQUE NOT NULL
+
+CREATE PROCEDURE insertItem(IN p_name TEXT)
+BEGIN
+  INSERT INTO item (name) VALUES (p_name);
+END //
+
+CREATE PROCEDURE removeItem(IN p_id INT)
+BEGIN
+  DELETE FROM item WHERE item.id = p_id;
+END //
+
+CREATE PROCEDURE getItemName(IN p_id INT)
+BEGIN
+  SELECT name FROM item WHERE item.id = p_id;
+END //
+
+CREATE PROCEDURE getItemId(IN p_name TEXT)
+BEGIN
+  SELECT id FROM item WHERE item.name = p_name;
+END //
+
+CREATE PROCEDURE addItemToRecipe(IN p_itemId INT, IN p_recipeId INT)
+BEGIN
+  INSERT INTO ingredients (itemId, recipeId) VALUES (p_itemId, p_recipeId);
+END //
+
+CREATE PROCEDURE addItemToStore(IN p_itemId INT, IN p_storeId INT)
+BEGIN
+  INSERT INTO ingredients (itemId, storeId) VALUES (p_itemId, p_storeId);
+END //
+
+CREATE PROCEDURE insertStore(
+  IN p_name TEXT,
+  IN p_url TEXT,
+  IN p_district TEXT)
+BEGIN
+  INSERT IGNORE INTO store (name, url, district) VALUES (p_name, p_url, p_district);
 END //
 
 DELIMITER ;
-
---CREATE USER 'your_username'@'your_host' IDENTIFIED BY 'your_password';
-
---GRANT EXECUTE ON PROCEDURE your_database.your_stored_procedure TO 'your_username'@'your_host';

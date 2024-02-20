@@ -36,10 +36,6 @@ app.use((err, req, res, next) => {
 
 model.init()
   .then(() => {
-    // Call the setup method to perform database setup
-    return model.setup();
-  })
-  .then(() => {
     app.get('/', (req, res) => {
       res.sendFile(path.join(__dirname, './public/index.html'));
     });
