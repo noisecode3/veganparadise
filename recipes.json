@@ -1,0 +1,40 @@
+[
+  {
+    "userId": 1,
+    "name": "Vegan BBQ hamburger with Mangoraja",
+    "picturePath": "public/images/pic03.jpg",
+    "time": 25,
+    "bodyParagrps": [
+      "Thaw Anammas formable mince and mix the bbq sauce.",
+      "Shape the mince into 4 burgers. Brush with oil on both sides.",
+      "Grill or fry the burgers for about 4-5 minutes on each side. Put the cheese on the burgers and let it melt.",
+      "Mangoraja - mix all the ingredients in a bowl, season with salt, pepper and possibly more curry.",
+      "Serve the burgers in hamburger buns, with pickled red onion, lettuce, tomatoes and Mangorajan."
+    ],
+    "items": [
+      [
+        "burgers",
+        { "name": "formable vegetable mince", "variant": "", "quantity": 500, "unit": "g" },
+        { "name": "smoky bbq sauce", "variant": "", "quantity": 4, "unit": "tbsp" },
+        { "name": "vegan hamburger cheese", "variant": "", "quantity": 4, "unit": "slices" },
+        { "name": "salt & pepper", "variant": "", "quantity": null, "unit": "" }
+      ],
+      [
+        "mangoraja",
+        { "name": "vegan mayonnaise", "variant": "", "quantity": 100, "unit": "g" },
+        { "name": "crème fraiche", "variant": "plant-based", "quantity": 100, "unit": "g" },
+        { "name": "mango chutney", "variant": "", "quantity": 1, "unit": "1/2 cup" },
+        { "name": "chili", "variant": "finely chopped", "quantity": 1, "unit": "" },
+        { "name": "curry", "variant": "", "quantity": 1, "unit": "tbsp" },
+        { "name": "salt & pepper", "variant": "", "quantity": null, "unit": "" }
+      ],
+      [
+        "serving",
+        { "name": "hamburger buns", "variant": "", "quantity": 4, "unit": "" },
+        { "name": "pickled red onion", "variant": "", "quantity": 1, "unit": "pot" },
+        { "name": "mixed salad", "variant": "", "quantity": 1, "unit": "pot" },
+        { "name": "tomatoes", "variant": "", "quantity": 4, "unit": "sliced" }
+      ]
+    ]
+  }
+]

@@ -34,5 +34,56 @@ router.get('/store=:storename', function (req, res) {
   }
 });
 
+/*
+
+CREATE PROCEDURE getRecipeList()
+BEGIN
+  SELECT id, name, picture FROM recipe;
+END //
+
+*/
+
+// Set EJS as the view engine
+// Define a route to handle the GET request
+router.get('/menu.html', async (req, res) => {
+  try {
+    // Acquire a connection from the pool
+    const client = await model.pool.getConnection();
+    const [list] = await client.execute('CALL getRecipeList()');
+    console.log(list[0]);
+    res.render('menu', { pictureCards: list[0] });
+    client.release();
+  }
+  catch (error)
+  {
+
+    res.status(500).send('Internal Server Error');
+    client.release();
+    console.log('${error.message}');
+  }
+});
+
+// Define a route to handle image requests
+
+
+router.get('/image/:id', async (req, res) => {
+  const pictureId = parseInt(req.params.id, 10);
+  const client = await model.pool.getConnection();
+  const [result] = await client.execute('CALL getPicture(?)', [pictureId]);
+
+  res.setHeader('Content-Disposition', 'attachment; filename= req.params.id +".jpg"');
+
+  // Set the appropriate content type for the response
+  //res.contentType(results[0].fileType); // Adjust based on your image format
+  res.contentType('result[0][0].fileType'); // Adjust based on your image format
+
+  // Send the binary image data as the response
+  res.end(result[0][0].data, 'binary');
+  client.release();
+});
+
+
+
+
 module.exports = router;
 

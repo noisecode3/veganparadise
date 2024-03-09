@@ -7,10 +7,14 @@ const view = require('./view');
 const controller = require('./controller');
 
 process.execArgv = process.execArgv.filter(arg => !arg.includes('inspect'));
-process.execArgv.push(`--inspect=9229`);
+process.execArgv.push(`--inspect=9230`);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Enable ejs and set views dir
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 
 // Enable sessions
 app.use(session({ secret: 'your-secret-key', resave: false, saveUninitialized: false }));
@@ -40,10 +44,7 @@ model.init()
       res.sendFile(path.join(__dirname, './public/index.html'));
     });
     
-    // Mount the views router
     app.use('/', view);
-
-    // Mount the controllers router
     app.use('/', controller);
 
     // Catch-all route for serving other files from "public"
@@ -51,7 +52,6 @@ model.init()
       res.sendFile(path.join(__dirname, './public', req.url));
     });
 
-    // Start the server
     app.listen(PORT, '0.0.0.0', () => {
       console.log(`Server is running on port ${PORT}`);
     });

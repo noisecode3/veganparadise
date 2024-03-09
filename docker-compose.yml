@@ -3,15 +3,16 @@ services:
   api:
     image: node:18-alpine
     working_dir: /usr/src/app
+    user: node
     environment:
       - NODE_ENV=production
     ports:
-      - "9229:9229"
+      - "9230:9230"
     volumes:
       - .:/usr/src/app
     depends_on:
       - db
-    command: sh -c "npm install --only=production && node --inspect=0.0.0.0:9229 index.js"
+    command: sh -c "npm install --only=production && node --inspect=0.0.0.0:9230 index.js"
     networks:
       - tofu_net
 
