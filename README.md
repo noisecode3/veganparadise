@@ -1,6 +1,6 @@
 # Vegan Paradise API
 
-This is a simple API built with [Express](https://expressjs.com/).
+This is joke docker website that will not be hosted, but roasted.
 
 ## Getting Started
 

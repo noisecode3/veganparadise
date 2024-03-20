@@ -37,6 +37,41 @@
                 </nav>
             </header>
             <!-- Main -->
+            
+
+  <script>
+    async function hashCredentials() {
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+
+      // Hash username
+      const usernameBuffer = new TextEncoder().encode(username);
+      const usernameHash = await crypto.subtle.digest('SHA-256', usernameBuffer);
+      const usernameHashArray = Array.from(new Uint8Array(usernameHash));
+      const hashedUsername = usernameHashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
+
+      // Hash password
+      const passwordBuffer = new TextEncoder().encode(password);
+      const passwordHash = await crypto.subtle.digest('SHA-256', passwordBuffer);
+      const passwordHashArray = Array.from(new Uint8Array(passwordHash));
+      const hashedPassword = passwordHashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
+
+      console.log('Hashed Username:', hashedUsername);
+      console.log('Hashed Password:', hashedPassword);
+    }
+  </script>
+
+  <form>
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username" required>
+
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password" required>
+
+    <button type="button" onclick="hashCredentials()">Hash Credentials</button>
+  </form>
+
+
             <div id="main" class="wrapper style1">
                 <div class="container">
                     <header class="major">

@@ -3,7 +3,7 @@
     "userId": 1,
     "name": "Vegan BBQ hamburger with Mangoraja",
     "picturePath": "public/images/pic03.jpg",
-    "time": 25,
+    "time": 35,
     "bodyParagrps": [
       "Thaw Anammas formable mince and mix the bbq sauce.",
       "Shape the mince into 4 burgers. Brush with oil on both sides.",
@@ -23,7 +23,7 @@
         "mangoraja",
         { "name": "vegan mayonnaise", "variant": "", "quantity": 100, "unit": "g" },
         { "name": "crème fraiche", "variant": "plant-based", "quantity": 100, "unit": "g" },
-        { "name": "mango chutney", "variant": "", "quantity": 1, "unit": "1/2 cup" },
+        { "name": "mango chutney", "variant": "", "quantity": 0.5, "unit": "cup" },
         { "name": "chili", "variant": "finely chopped", "quantity": 1, "unit": "" },
         { "name": "curry", "variant": "", "quantity": 1, "unit": "tbsp" },
         { "name": "salt & pepper", "variant": "", "quantity": null, "unit": "" }
@@ -34,6 +34,57 @@
         { "name": "pickled red onion", "variant": "", "quantity": 1, "unit": "pot" },
         { "name": "mixed salad", "variant": "", "quantity": 1, "unit": "pot" },
         { "name": "tomatoes", "variant": "", "quantity": 4, "unit": "sliced" }
+      ]
+    ]
+  },
+  {
+    "userId": 1,
+    "name": "Tacopizza",
+    "picturePath": "public/images/pic04.webp",
+    "time": 75,
+    "bodyParagrps": [
+      "Dissolve the yeast with lukewarm water.",
+      "Add the rest of the ingredients and knead well for a few minutes.",
+      "It would be best if the dough is allowed to rise in a bowl large enough with plastic cover in the fridge overnight. At least let the dough rise at room temperature for about 45 minutes.",
+      "Flour the dough so it doesn't stick.",
+      "Divide it into 4 parts and form into a ball. Leave to rest for about 10 minutes and they will be easier to roll.",
+      "Boil the water, add tomato puree and taco seasoning. Let the sauce simmer for 1-2 minutes, turn off the heat and set aside.",
+      "Prepare the minced meat. Fry it until it turns brown, add taco seasoning and fry a little more.",
+      "Heat the oven to 200°. Roll out a ball into a round pizza and place on a sheet of baking paper.",
+      "Brush on tomato sauce, add minced meat and finish with grated cheese.",
+      "Bake in the middle of the oven for about 10-13 minutes, until the pizza gets a nice color.",
+      "Top with desired vegetables, drizzle with sour cream or crème fraîche."
+    ],
+    "items": [
+      [
+        "pizza dough",
+        { "name": "yeast", "variant": "", "quantity": 20, "unit": "g" },
+        { "name": "water", "variant": "", "quantity": 2.5, "unit": "dl" },
+        { "name": "special wheat flour", "variant": "", "quantity": 5, "unit": "dl" },
+        { "name": "durum wheat", "variant": "", "quantity": 1, "unit": "dl" },
+        { "name": "oil", "variant": "", "quantity": 0.5, "unit": "dl" },
+        { "name": "salt", "variant": "", "quantity": 1, "unit": "tsp" },
+        { "name": "sugar", "variant": "", "quantity": 0.5, "unit": "tsp" }
+      ],
+      [
+        "tomato sauce",
+        { "name": "tomato puree", "variant": "", "quantity": 3, "unit": "tbsp" },
+        { "name": "water", "variant": "", "quantity": 2, "unit": "dl" },
+        { "name": "taco seasoning", "variant": "", "quantity": 1, "unit": "tbsp" }
+      ],
+      [
+        "toppings",
+        { "name": "soya mince", "variant": "", "quantity": 500, "unit": "g" },
+        { "name": "taco seasoning", "variant": "", "quantity": 5, "unit": "tbsp" },
+        { "name": "tofutti vegan cheese", "variant": "", "quantity": 400, "unit": "g" },
+        { "name": "vegan crème fraiche", "variant": "", "quantity": 3, "unit": "dl" },
+        { "name": "lettuce", "variant": "", "quantity": null, "unit": "" },
+        { "name": "pepper", "variant": "", "quantity": null, "unit": "" },
+        { "name": "onion", "variant": "", "quantity": null, "unit": "" },
+        { "name": "olives", "variant": "", "quantity": null, "unit": "" },
+        { "name": "tomato", "variant": "", "quantity": null, "unit": "" },
+        { "name": "cucumber", "variant": "", "quantity": null, "unit": "" },
+        { "name": "jalapeno", "variant": "", "quantity": null, "unit": "" }
       ]
     ]
   }

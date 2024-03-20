@@ -9,9 +9,9 @@
         <title>Vegan Paradise</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-        <link rel="stylesheet" href="assets/css/main.css" />
+        <link rel="stylesheet" href="https://localhost/assets/css/main.css" />
         <noscript>
-            <link rel="stylesheet" href="assets/css/noscript.css" />
+            <link rel="stylesheet" href="https://localhost/assets/css/noscript.css" />
         </noscript>
     </head>
     <body class="is-preload landing">
@@ -24,44 +24,39 @@
                         <li><a href="index.html">Home</a></li>
                         <li><a href="menu.html">Menu</a></li>
                         <li>
-                            <a href="#">Layouts</a>
+                            <a href="#">Debug</a>
                             <ul>
-                                <li><a href="left-sidebar.html">Left Sidebar</a></li>
-                                <li><a href="right-sidebar.html">Right Sidebar</a></li>
-                                <li><a href="no-sidebar.html">No Sidebar</a></li>
-                                <li>
-                                    <a href="#">Submenu</a>
-                                    <ul>
-                                        <li><a href="#">Option 1</a></li>
-                                        <li><a href="#">Option 2</a></li>
-                                        <li><a href="#">Option 3</a></li>
-                                        <li><a href="#">Option 4</a></li>
-                                    </ul>
-                                </li>
+                                <li><a href="form.html">Form</a></li>
+                                <li><a href="login.html">Login</a></li>
+                                <li><a href="signup.html">Signup</a></li>
+                                <li><a href="elements.html">Elements</a></li>
                             </ul>
                         </li>
-                        <li><a href="elements.html">Elements</a></li>
                         <li><a href="#" class="button primary">Sign Up</a></li>
                     </ul>
                 </nav>
             </header>
+
+            <!-- Main -->
             <div id="main" class="wrapper style1">
                 <div class="container">
+                    <header class="major">
+                        <h2>Menu</h2>
+                    </header>
                     <section>
-                        <h3>Image</h3>
-                        <h4>Fit</h4>
                         <div class="box alt">
                             <div class="row gtr-50 gtr-uniform">
+                                <% pictureCards.forEach(card => { %>
                                 <div class="col-4 col-6-xsmall">
-                                    <span class="image fit">
-                                        <% pictureCards.forEach(card => { %>
-                                        <div>
-                                            <h2><%= card.name %></h2>
-                                            <img src="/image/<%= card.pictureId %>" alt="<%= card.name %>">
-                                        </div>
-                                        <% }) %>
-                                    </span>
+                                    <div class="card">
+                                        <a href="https://localhost/recipe_<%= card.id %>.html">
+                                            <span class="image fit">
+                                                <img src="https://localhost/image/<%= card.pictureId %>" alt="">
+                                            </span>
+                                        </a>
+                                    </div>
                                 </div>
+                                <% }) %>
                             </div>
                         </div>
                     </section>
@@ -88,14 +83,14 @@
                 </footer>
             </div>
             <!-- Scripts -->
-            <script src="assets/js/jquery.min.js"></script>
-            <script src="assets/js/jquery.scrolly.min.js"></script>
-            <script src="assets/js/jquery.dropotron.min.js"></script>
-            <script src="assets/js/jquery.scrollex.min.js"></script>
-            <script src="assets/js/browser.min.js"></script>
-            <script src="assets/js/breakpoints.min.js"></script>
-            <script src="assets/js/util.js"></script>
-            <script src="assets/js/main.js"></script>
+            <script src="https://localhost/assets/js/jquery.min.js"></script>
+            <script src="https://localhost/assets/js/jquery.scrolly.min.js"></script>
+            <script src="https://localhost/assets/js/jquery.dropotron.min.js"></script>
+            <script src="https://localhost/assets/js/jquery.scrollex.min.js"></script>
+            <script src="https://localhost/assets/js/browser.min.js"></script>
+            <script src="https://localhost/assets/js/breakpoints.min.js"></script>
+            <script src="https://localhost/assets/js/util.js"></script>
+            <script src="https://localhost/assets/js/main.js"></script>
 
     </body>
 </html>

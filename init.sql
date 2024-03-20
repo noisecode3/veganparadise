@@ -36,12 +36,17 @@ ALTER TABLE users AUTO_INCREMENT = 1;
 CREATE TABLE IF NOT EXISTS recipe (
   id INT AUTO_INCREMENT PRIMARY KEY,
   userId INT NOT NULL,
-  name TEXT NOT NULL,
+  name VARCHAR(255) UNIQUE NOT NULL,
   pictureId INT NOT NULL,
   time INT NOT NULL,
   body TEXT NOT NULL,
   FOREIGN KEY (userId) REFERENCES users(id),
   FOREIGN KEY (pictureId) REFERENCES picture(id)
+);
+
+CREATE TABLE IF NOT EXISTS dish (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(255) UNIQUE NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS item (
@@ -60,12 +65,14 @@ CREATE TABLE IF NOT EXISTS store (
 CREATE TABLE IF NOT EXISTS ingredients (
   itemId INT NOT NULL,
   recipeId INT NOT NULL,
-  quantity INT,
+  dishId INT NOT NULL,
+  quantity FLOAT,
   unit TEXT,
   variant TEXT,
-  PRIMARY KEY (itemId, recipeId),
+  PRIMARY KEY (itemId, recipeId, dishId),
   FOREIGN KEY (itemId) REFERENCES item(id),
-  FOREIGN KEY (recipeId) REFERENCES recipe(id)
+  FOREIGN KEY (recipeId) REFERENCES recipe(id),
+  FOREIGN KEY (dishId) REFERENCES dish(id)
 );
 
 -- Middle table for item in the store 
@@ -108,7 +115,7 @@ CREATE PROCEDURE insertUser(
 )
 BEGIN
   DECLARE pictureId INT;
-  
+
   -- Generate a random salt
   SET @salt = UNHEX(SHA2(UUID(), 256));
 
@@ -117,9 +124,15 @@ BEGIN
 
   CALL insertPicture(p_pictureData, @pictureId);
 
-  INSERT INTO users (username, password, salt, pictureId)
-    VALUES (p_username, @salt, @hashed_password, @pictureId);
+  -- Try to insert the user, handle duplicate key violation
+  INSERT IGNORE INTO users (username, password, salt, pictureId)
+    VALUES (p_username, @hashed_password, @salt, @pictureId);
 
+  -- Check if the insertion was successful or if the username already exists
+  IF ROW_COUNT() = 0 THEN
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'Username already exists.';
+  END IF;
 END //
 
 CREATE PROCEDURE getUserID(IN p_username VARCHAR(255), IN p_password VARCHAR(255))
@@ -155,6 +168,8 @@ BEGIN
   
   INSERT IGNORE INTO recipe (userId, name, pictureId, time, body )
     VALUES (p_userID, p_name, @pictureId, p_time, p_body );
+
+  SELECT LAST_INSERT_ID() AS recipeId;
 END //
 
 CREATE PROCEDURE removeRecipe(IN p_id INT)
@@ -181,7 +196,30 @@ END //
 
 CREATE PROCEDURE getRecipe(IN p_id INT)
 BEGIN
-  SELECT userId, name, pictureId, time, body FROM recipe WHERE recipe.id = p_id;
+  SELECT
+    recipe.userId,
+    recipe.name,
+    recipe.pictureId,
+    recipe.time,
+    recipe.body
+ FROM
+    recipe
+ WHERE recipe.id = p_id;
+
+  SELECT
+    dish.name AS dishName,
+    item.name,
+    ingredients.quantity,
+    ingredients.unit,
+    ingredients.variant
+  FROM
+    ingredients
+  LEFT JOIN
+    item ON ingredients.itemId = item.id
+  LEFT JOIN
+    dish ON ingredients.dishId = dish.id
+  WHERE
+    ingredients.recipeId = p_id;
 END //
 
 CREATE PROCEDURE changeRecipeName(IN p_id INT)
@@ -227,6 +265,20 @@ BEGIN
 END //
 
 
+CREATE PROCEDURE addOrUpdateDish(IN p_name TEXT, OUT p_dishId INT)
+BEGIN
+  DECLARE dishId INT;
+
+  SELECT id INTO dishId FROM dish WHERE name = p_name LIMIT 1;
+
+  IF dishId IS NULL THEN
+    INSERT INTO dish (name) VALUES (p_name);
+    SET p_dishId = LAST_INSERT_ID();
+  ELSE
+    SET p_dishId = dishId;
+  END IF;
+END //
+
 CREATE PROCEDURE addOrUpdateItem(IN p_name TEXT, OUT p_itemId INT)
 BEGIN
   DECLARE itemId INT;
@@ -237,31 +289,37 @@ BEGIN
     CALL insertItem(p_name);
     -- INSERT INTO item (name) VALUES (p_name);
     SET p_itemId = LAST_INSERT_ID();
+  ELSE
+    SET p_itemId = itemId;
   END IF;
 END //
 
 CREATE PROCEDURE addItemToRecipe(
   IN p_itemId INT,
+  IN p_dishId INT,
   IN p_recipeId INT,
-  IN p_quantity INT,
-  IN p_variant TEXT,
-  IN p_unit TEXT)
+  IN p_quantity FLOAT,
+  IN p_unit TEXT,
+  IN p_variant TEXT)
 BEGIN
-  INSERT IGNORE INTO ingredients (itemId, recipeId, quantity, unit, variant)
-  VALUES (p_itemId, p_recipeId, p_quantity, p_unit, p_variant);
+  INSERT IGNORE INTO ingredients (itemId, dishId, recipeId, quantity, unit, variant)
+  VALUES (p_itemId, p_dishId, p_recipeId, p_quantity, p_unit, p_variant);
 END //
 
 CREATE PROCEDURE addIngredientToRecipe(
   IN p_itemName TEXT,
+  IN p_dishName TEXT,
   IN p_recipeId INT,
-  IN p_quantity INT,
+  IN p_quantity FLOAT,
   IN p_unit TEXT,
   IN p_variant TEXT
 )
 BEGIN
+  DECLARE dishId INT;
   DECLARE itemId INT;
+  CALL addOrUpdateDish(p_dishName, dishId);
   CALL addOrUpdateItem(p_itemName, itemId);
-  CALL addItemToRecipe(itemId, p_recipeId, p_quantity, p_unit, p_variant);
+  CALL addItemToRecipe(itemId, dishId, p_recipeId, p_quantity, p_unit, p_variant);
 END //
 
 CREATE PROCEDURE addItemToStore(
@@ -281,5 +339,6 @@ BEGIN
   INSERT IGNORE INTO store (name, url, district)
   VALUES (p_name, p_url, p_district);
 END //
+
 
 DELIMITER ;

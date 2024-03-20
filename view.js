@@ -70,20 +70,46 @@ router.get('/image/:id', async (req, res) => {
   const pictureId = parseInt(req.params.id, 10);
   const client = await model.pool.getConnection();
   const [result] = await client.execute('CALL getPicture(?)', [pictureId]);
-
   res.setHeader('Content-Disposition', 'attachment; filename= req.params.id +".jpg"');
-
-  // Set the appropriate content type for the response
-  //res.contentType(results[0].fileType); // Adjust based on your image format
-  res.contentType('result[0][0].fileType'); // Adjust based on your image format
-
-  // Send the binary image data as the response
+  res.contentType('result[0][0].fileType');
   res.end(result[0][0].data, 'binary');
   client.release();
 });
 
 
 
+
+router.get('/recipe_:id.html', async (req, res) => {
+    const recipeId = parseInt(req.params.id, 10);
+    const client = await model.pool.getConnection();
+    const [result] = await client.execute('CALL getRecipe(?)', [recipeId]);
+    const recipeData = result[0][0];
+    const ingredientsData = result[1];
+
+    // Check if there's data
+    if (!recipeData) {
+        res.status(404).send('Recipe not found');
+        return;
+    }
+
+    console.log(recipeData);
+    console.log(ingredientsData);
+
+    res.render('recipe', { recipe: recipeData, ingredients: ingredientsData });
+    client.release();
+});
+
+
+/*
+router.get('/recipe/:id', async (req, res) => {
+  const recipeId = parseInt(req.params.id, 10);
+  const client = await model.pool.getConnection();
+  const [result] = await client.execute('CALL getRecipe(?)', [recipeId]);
+  console.log(result[0][0]);
+  res.render('recipe', { recipe: result[0][0] });
+  client.release();
+});
+*/
 
 module.exports = router;
 

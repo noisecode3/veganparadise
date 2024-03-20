@@ -1,0 +1,264 @@
+<!DOCTYPE HTML>
+<!--
+    Landed by HTML5 UP
+    html5up.net | @ajlkn
+    Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+    <head>
+        <title>Vegan Paradise</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+        <link rel="stylesheet" href="assets/css/main.css" />
+        <noscript>
+            <link rel="stylesheet" href="assets/css/noscript.css" />
+        </noscript>
+
+        <script>
+            let bodyParagrps = [];
+            let items = [];
+
+            function addBody() {
+                const message = document.getElementById('message').value;
+                bodyParagrps.push(message);
+            }
+
+            function addDish() {
+                const dishName = document.getElementById('dishName').value;
+                const dish = [dishName];
+                items.push(dish);
+                populateIngredientsList();
+            }
+
+            function addIngredient() {
+                const dishIndex = document.getElementById('dish').selectedIndex - 1;
+                if (dishIndex < 0) {
+                    alert('Please select a dish first.');
+                    return;
+                }
+
+                const ingredientName = document.getElementById('ingredientName').value;
+                const ingredientVariant = document.getElementById('ingredientVariant').value;
+                const ingredientQuantity = document.getElementById('ingredientQuantity').value;
+                const ingredientUnit = document.getElementById('ingredientUnit').value;
+
+                const ingredient = {
+                    name: ingredientName,
+                    variant: ingredientVariant,
+                    quantity: ingredientQuantity,
+                    unit: ingredientUnit
+                };
+
+                items[dishIndex].push(ingredient);
+            }
+
+            function populateIngredientsList() {
+                const selectElement = document.getElementById('dish');
+                selectElement.innerHTML = '<option value="">- Select a Dish -</option>';
+
+                items.forEach((dish, index) => {
+                    const option = document.createElement('option');
+                    option.text = dish[0];
+                    option.value = index;
+                    selectElement.add(option);
+                });
+            }
+
+            function saveRecipe() {
+                const recipeName = document.getElementById('recipeName').value;
+                const picturePath = "public/images/pic03.jpg"; // Assuming this is a static path
+                const time = 35; // Assuming this is a static value
+
+                const recipe = {
+                    userId: 1,
+                    name: recipeName,
+                    picturePath: picturePath,
+                    time: time,
+                    bodyParagrps: bodyParagrps,
+                    items: items
+                };
+
+                // Now you can send the `recipe` object to the server
+                console.log(recipe);
+                // Code to send `recipe` object to the server via fetch or other means
+            }
+        </script>
+    </head>
+    <body class="is-preload">
+        <div id="page-wrapper">
+            <!-- Header -->
+            <header id="header">
+                <h1 id="logo"><a href="index.html">Vegan Paradise</a></h1>
+                <nav id="nav">
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="menu.html">Menu</a></li>
+                        <li>
+                            <a href="#">Debug</a>
+                            <ul>
+                                <li><a href="form.html">Form</a></li>
+                                <li><a href="login.html">Login</a></li>
+                                <li><a href="signup.html">Signup</a></li>
+                                <li><a href="elements.html">Elements</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#" class="button primary">Sign Up</a></li>
+                    </ul>
+                </nav>
+            </header>
+
+            <!-- Main -->
+            <div id="main" class="wrapper style1">
+                <div class="container">
+                    <!-- Form -->
+                    <section>
+                        <h3>Title</h3>
+                        <form id="recipeForm" method="post" action="#">
+                            <div class="row gtr-uniform gtr-50">
+                                <div class="col-12">
+                                        <input type="text" name="recipeName" id="recipeName" placeholder="Recipe Name" />
+
+                                        <style>
+                                        /* Hide the default file input */
+                                            input[type="file"] {
+                                            display: none;
+                                        }
+
+                                            .custom-file-input {
+                                                background-color: #4CAF50; /* Green */
+                                                color: white; 
+                                                padding: 10px 15px;
+                                                border: none; 
+                                                border-radius: 5px; 
+                                                cursor: pointer; 
+                                            }
+
+                                            .file-selected {
+                                                margin-left: 10px;
+                                                color: #333;
+                                        }
+                                        </style>
+
+                                        <!-- HTML -->
+                                        <label for="fileInput" class="custom-file-input">Choose Picure</label>
+                                        <span class="file-selected">No file selected</span>
+                                        <input type="file" id="fileInput" accept="image/*">
+
+                                        <script>
+                                            function uploadFile() {
+                                                // maybe integrate this with add recepi();
+                                                const fileInput = document.getElementById('fileInput');
+                                                const file = fileInput.files[0];
+
+                                                if (file) {
+                                                    const formData = new FormData();
+                                                    formData.append('file', file);
+
+                                                    fetch('/upload', {
+                                                        method: 'POST',
+                                                        body: formData
+                                                    })
+                                                        .then(response => response.json())
+                                                        .then(data => {
+                                                            console.log('File uploaded:', data);
+                                                        })
+                                                        .catch(error => {
+                                                            console.error('Error uploading file:', error);
+                                                        });
+                                                } else {
+                                                    console.error('No file selected');
+                                                }
+                                            }
+                                        </script>
+                                </div>
+                                <!-- Dish -->
+                                <div class="col-12">
+                                    <h4>Dish</h4>
+                                    <div id="dish" class="row gtr-0">
+                                        <input type="text" name="dishName" id="dishName" placeholder="Name" />
+                                    </div>
+                                    <div class="row gtr-0">
+                                        <ul class="actions" >
+                                            <li><input type="button" value="Add" class="primary col-3" onclick="addDish()" /></li>
+                                        </ul>
+                                    </div>
+
+                                <!-- Ingredients -->
+                                <div class="col-12">
+                                    <h4>Ingredients</h4>
+                                    <div id="ingredientsList" class="row gtr-0">
+                                        <select name="Dish" id="dish" class="col-12">
+                                            <option value="">- Make A dish first -</option>
+                                        </select>
+                                        <div class="col-3">
+                                            <input type="text" name="ingredientName" id="ingredientName" placeholder="Ingredient Name" />
+                                        </div>
+                                        <div class="col-3">
+                                            <input type="text" name="ingredientVariant" id="ingredientVariant" placeholder="Ingredient Variant" />
+                                        </div>
+                                        <div class="col-3">
+                                            <input type="text" name="ingredientQuantity" id="ingredientQuantity" placeholder="Ingredient Quantity" />
+                                        </div>
+                                        <div class="col-3">
+                                            <input type="text" name="ingredientUnit" id="ingredientUnit" placeholder="Ingredient Unit" />
+                                        </div>
+                                    </div>
+                                    <div class="row gtr-0">
+                                        <ul class="actions" >
+                                            <li><input type="button" value="Save Ingredient" class="primary col-3" onclick="addIngredient()" /></li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <h4>Instructions</h4>
+                                    <div class="col-12">
+                                        <textarea name="message" id="message" placeholder="Enter your message" rows="6"></textarea>
+                                    </div>
+                                    <div class="row gtr-0">
+                                        <ul class="actions" >
+                                            <li><input type="button" value="Add" class="primary col-3" onclick="addBody()" /></li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <ul class="actions">
+                                        <li><input type="button" value="Save Recipe" class="primary" onclick="saveRecipe()" /></li>
+                                        <!-- Use type="button" to prevent form submission -->
+                                        <li><input type="reset" value="Reset" /></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </form>
+                    </section>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer id="footer">
+                <ul class="icons">
+                    <li><a href="#" class="icon brands alt fa-twitter"><span class="label">Twitter</span></a></li>
+                    <li><a href="#" class="icon brands alt fa-facebook-f"><span class="label">Facebook</span></a></li>
+                    <li><a href="#" class="icon brands alt fa-linkedin-in"><span class="label">LinkedIn</span></a></li>
+                    <li><a href="#" class="icon brands alt fa-instagram"><span class="label">Instagram</span></a></li>
+                    <li><a href="#" class="icon brands alt fa-github"><span class="label">GitHub</span></a></li>
+                    <li><a href="#" class="icon solid alt fa-envelope"><span class="label">Email</span></a></li>
+                </ul>
+                <ul class="copyright">
+                    <li>&copy; Untitled. All rights reserved.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+                </ul>
+            </footer>
+        </div>
+        <!-- Scripts -->
+        <script src="assets/js/jquery.min.js"></script>
+        <script src="assets/js/jquery.scrolly.min.js"></script>
+        <script src="assets/js/jquery.dropotron.min.js"></script>
+        <script src="assets/js/jquery.scrollex.min.js"></script>
+        <script src="assets/js/browser.min.js"></script>
+        <script src="assets/js/breakpoints.min.js"></script>
+        <script src="assets/js/util.js"></script>
+        <script src="assets/js/main.js"></script>
+
+    </body>
+</html>

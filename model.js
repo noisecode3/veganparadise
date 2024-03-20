@@ -67,11 +67,23 @@ class Model
             {
               const picture = await fs.readFile(user.picturePath, { encoding: null, flag: 'r' });
               //const size =  await pictureSize(picture);
-              await this.client.query('CALL insertUser(?, ?, ?)', [
-                user.username,
-                user.password,
-                picture,
-              ]);
+              try {
+                // Your code that might throw an error, such as a database query
+                await this.client.query('CALL insertUser(?, ?, ?)', [
+                  user.username,
+                  user.password,
+                  picture,
+                ]);
+                // Continue with your code if there is no error
+              } catch (error) {
+                // Handle the error here
+                if (error.code === 'ER_SIGNAL_EXCEPTION' && error.sqlMessage === 'Username already exists.') {
+                  console.error('Username already exists.');
+                } else {
+                  // Handle other types of errors
+                  console.error('Error during recipe insertion:', error);
+                }
+              }
             }
             data = await fs.readFile('./stores.json', 'utf8');
             this.stores = JSON.parse(data);
@@ -90,10 +102,13 @@ class Model
 
             for (const recipe of this.recipes)
             {
-              let body ="";
-              for (const bodyParagrp of recipe.bodyParagrps)
+              let body = "";
+              const size = recipe.bodyParagrps.length;
+              console.log(size);
+
+              for (let i = 0; i < size; i++)
               {
-                body+=bodyParagrp + "<br>\n"
+                body+=recipe.bodyParagrps[i]+";";
               }
               const pictureData = await fs.readFile(recipe.picturePath, { encoding: null, flag: 'r' });
               // Add the recipe
@@ -108,31 +123,30 @@ class Model
 
                 console.log('Recipe Result:', recipeResult);
 
-                // Rest of your code...
+                const recipeId = recipeResult[0][0].recipeId;
+                
+                for (const innerLoop of recipe.items)
+                {
+                  const dishTitle = innerLoop[0];
+                  if (typeof dishTitle === "string")
+                  {
+                    const slicedInnerLoop = innerLoop.slice(1);
+                    for (const item of slicedInnerLoop)
+                    {
+                      await this.client.execute('CALL addIngredientToRecipe(?, ?, ?, ?, ?, ?)', [
+                        item.name,
+                        dishTitle,
+                        recipeId,
+                        item.quantity,
+                        item.unit,
+                        item.variant
+                      ]);
+                    }
+                  }
+                }
 
               } catch (error) {
                 console.error('Error executing insertRecipe stored procedure:', error);
-              }
-
-              //const recipeId = recipeResult[0].insertId;
-              //console.log(recipeResult[0]);
-
-              for (const innerLoop of recipe.items)
-              {
-                if (typeof innerLoop[0] === "string")
-                {
-                  const slicedInnerLoop = innerLoop.slice(1);
-                  for (const item of slicedInnerLoop)
-                  {
-                    await this.client.execute('CALL addIngredientToRecipe(?, ?, ?, ?, ?)', [
-                      item.name,
-                      1,
-                      item.quantity,
-                      item.unit,
-                      item.variant
-                    ]);
-                  }
-                }
               }
             }
 
