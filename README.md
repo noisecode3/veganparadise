@@ -7,6 +7,8 @@ This is joke docker website that will not be hosted, but roasted.
 1. Run docker with output to terminal: `docker-compose up`
 2. Take down server: `docker-compose down -v` on another terminal or use ctrl+C
 3. Run with more then one server `docker-compose up -d --scale api=3`
+4. If you get failed to bind port 127.0.0.1:7306/tcp: Error starting userland proxy:
+    you can add `DOCKER_OPTS="--userland-proxy=false"` to `/etc/default/docker`
 
 ## Entering mysql server
 
